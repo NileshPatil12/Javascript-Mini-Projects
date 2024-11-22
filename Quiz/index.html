@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Application</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .question {
+      margin-bottom: 20px;
+    }
+    .options {
+      list-style: none;
+      padding: 0;
+    }
+    .options li {
+      margin-bottom: 10px;
+    }
+    #timer {
+      font-size: 1.2em;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <h1>Quiz Application</h1>
+  <div id="quizContainer">
+    <div id="timer">Time Left: 60s</div>
+    <div id="questionContainer"></div>
+    <button id="nextButton">Next</button>
+  </div>
+  <div id="resultContainer" style="display:none;">
+    <h2>Quiz Results</h2>
+    <div id="score"></div>
+    <ul id="review"></ul>
+    <button onclick="location.reload()">Restart</button>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
