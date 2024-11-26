@@ -4,14 +4,174 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Expense Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 700px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+      color: #333;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #444;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 10px 0;
+      padding: 10px;
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .delete-button {
+      background-color: #f44336;
+      margin-left: 10px;
+    }
+    .edit-button {
+      background-color: #ffc107;
+    }
+  </style>
 </head>
 <body>
   <h1>Expense Tracker</h1>
+  
+  <!-- Input Fields -->
   <input type="text" id="description" placeholder="Expense Description">
   <input type="number" id="amount" placeholder="Amount">
+  <select id="category">
+    <option value="Food">Food</option>
+    <option value="Travel">Travel</option>
+    <option value="Shopping">Shopping</option>
+    <option value="Other">Other</option>
+  </select>
   <button id="addExpense">Add Expense</button>
+
+  <!-- Expense List -->
   <ul id="expenseList"></ul>
+  
+  <!-- Summary -->
   <p>Total: $<span id="totalAmount">0</span></p>
-  <script src="expense.js"></script>
+
+  <script>
+    // DOM Elements
+    const descriptionInput = document.getElementById("description");
+    const amountInput = document.getElementById("amount");
+    const categoryInput = document.getElementById("category");
+    const addExpenseButton = document.getElementById("addExpense");
+    const expenseList = document.getElementById("expenseList");
+    const totalAmountElement = document.getElementById("totalAmount");
+
+    // State
+    let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+    let editingIndex = null;
+
+    // Save to Local Storage
+    function saveExpenses() {
+      localStorage.setItem("expenses", JSON.stringify(expenses));
+    }
+
+    // Render Expenses
+    function renderExpenses() {
+      expenseList.innerHTML = "";
+      let total = 0;
+
+      expenses.forEach((expense, index) => {
+        total += expense.amount;
+
+        const li = document.createElement("li");
+        li.innerHTML = `
+          ${expense.description} (${expense.category}): $${expense.amount.toFixed(2)}
+          <div>
+            <button class="edit-button" onclick="editExpense(${index})">Edit</button>
+            <button class="delete-button" onclick="removeExpense(${index})">Delete</button>
+          </div>
+        `;
+        expenseList.appendChild(li);
+      });
+
+      // Update total
+      totalAmountElement.textContent = total.toFixed(2);
+    }
+
+    // Add or Update Expense
+    function addOrUpdateExpense() {
+      const description = descriptionInput.value.trim();
+      const amount = parseFloat(amountInput.value);
+      const category = categoryInput.value;
+
+      if (description && !isNaN(amount)) {
+        if (editingIndex !== null) {
+          // Update existing expense
+          expenses[editingIndex] = { description, amount, category };
+          editingIndex = null;
+          addExpenseButton.textContent = "Add Expense";
+        } else {
+          // Add new expense
+          expenses.push({ description, amount, category });
+        }
+
+        saveExpenses();
+        renderExpenses();
+        clearInputs();
+      }
+    }
+
+    // Remove Expense
+    function removeExpense(index) {
+      expenses.splice(index, 1);
+      saveExpenses();
+      renderExpenses();
+    }
+
+    // Edit Expense
+    function editExpense(index) {
+      const expense = expenses[index];
+      descriptionInput.value = expense.description;
+      amountInput.value = expense.amount;
+      categoryInput.value = expense.category;
+      editingIndex = index;
+      addExpenseButton.textContent = "Update Expense";
+    }
+
+    // Clear Inputs
+    function clearInputs() {
+      descriptionInput.value = "";
+      amountInput.value = "";
+      categoryInput.value = "Food";
+    }
+
+    // Event Listeners
+    addExpenseButton.addEventListener("click", addOrUpdateExpense);
+
+    // Initial Render
+    renderExpenses();
+  </script>
 </body>
 </html>
